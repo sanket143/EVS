@@ -1,0 +1,38 @@
+body {
+  background: url("/images/background.jpg");
+  background-size: cover;
+  background-attachment: fixed;
+}
+
+.card-wrapper {
+  display: flex;
+  background: url("/images/green_leaves.jpg");
+  background-size: cover;
+  background-repeat: no-repeat;
+  max-width: 954px;
+  margin: 30px;
+}
+
+.card-wrapper > div {
+  flex: 1;
+  height: 500px;
+}
+
+.card-img {
+  background: url("/images/card_back.jpg");
+  background-size: cover;
+  background-position: center;
+}
+
+.card-content {
+  font-family: 'Roboto', sans-serif;
+  color: white;
+  font-size: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.content-title {
+  margin: 15px;
+}

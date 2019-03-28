@@ -1,0 +1,7 @@
+.dropdown .dropbtn, .navbar a {
+    color: black;
+}
+
+.navbar a:hover, .dropdown:hover .dropbtn {
+    background: #0000001a;
+}

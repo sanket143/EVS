@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title> Plot </title>
+
+        <link rel='stylesheet' href='/stylesheets/style.css' />
+        <link rel='stylesheet' href='/stylesheets/view.css' />
+    </head>
+    <body>
+        <div class="navbar">
+            <a class="navlink" href="/">Home <i class="fas fa-angle-down"></i></a>
+            <a class="navlink">About Us <i class="fas fa-angle-down"></i></a>
+            <a class="navlink" href="/plot">Plot <i class="fas fa-angle-down"></i></a>
+            <!--
+            <div class="dropdown">
+                <button class="dropbtn">
+                    Dropdown 
+                    <i class="fa fa-caret-down"></i>
+                </button>
+                <div class="dropdown-content">
+                    <a href="#">February</a>
+                    <a href="#">Yearly</a>
+                    <a href="#">Predictions</a>
+                </div>
+            </div> 
+            -->
+        </div>
+        <div id="plot_div"></div>
+        <!-- Latest compiled and minified plotly.js JavaScript -->
+        <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+        <script>
+            var raw = <%- JSON.stringify(data) %>;
+            var temp = raw["temp"].map(function(item){
+                return parseFloat(item["TS"]);
+            });
+
+            var radi = raw["radi"].map(function(item){
+                return parseFloat(item["ALLSKY_SFC_LW_DWN"]);
+            })
+
+            var eo_arr = [];
+
+            for(i in temp){
+                Tk = 273 + temp[i];
+                RA = radi[i];
+                AB = 0.17;
+
+                h0 = RA * (1 - AB) / 58.3;
+
+                dels = 5304 * (Math.pow(Math.E, 21.255 - 5304/Tk)) / Math.pow(Tk, 2);
+                gamma = dels / (dels + 0.68);
+
+                E0 = 1.28 * h0 * gamma;
+                eo_arr.push(E0);
+            }
+
+            plot_div = document.getElementById("plot_div");
+            Plotly.plot(plot_div, [{
+                x: [...Array(eo_arr.length).keys()],
+                y: eo_arr
+            }]);
+        </script>
+    </body>
+</html>
