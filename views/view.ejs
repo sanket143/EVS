@@ -25,11 +25,81 @@
             </div> 
             -->
         </div>
-        <div id="plot_div"></div>
+        <div id="plots"> </div>
         <!-- Latest compiled and minified plotly.js JavaScript -->
         <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
         <script>
+            var months = [
+                "JAN",
+                "FEB",
+                "MAR",
+                "APR",
+                "MAY",
+                "JUN",
+                "JUL",
+                "AUG",
+                "SEP",
+                "OCT",
+                "NOV",
+                "DEC"
+            ];
+
+            var html = "";
+            for(i in months){
+                html += '<div class="plot-wrapper">';
+                html += '<h3 class="label">' + months[i] + '</h3>';
+                html += '<div id="' + months[i] + '"></div>';
+                html += '</div>';
+            }
+
+            document.getElementById("plots").innerHTML = html;
+
             var raw = <%- JSON.stringify(data) %>;
+            console.log(raw);
+
+            var raw_temp = raw.slice(33, 66);
+            var raw_radi = raw.slice(66, raw.length);
+            var x_axis = [...Array(33).keys()].map(function(num){
+                return num + 1985;
+            });
+
+            for(i in months){
+                month = months[i];
+                temp = raw_temp.map(function(item){
+                    return item[month];
+                })
+
+                radi = raw_radi.map(function(item){
+                    return item[month];
+                })
+
+
+                var eo_arr = [];
+
+                for(i in temp){
+                    Tk = 273 + temp[i];
+                    RA = radi[i];
+                    AB = 0.17;
+
+                    h0 = RA * (1 - AB) / 58.3;
+
+                    dels = 5304 * (Math.pow(Math.E, 21.255 - 5304/Tk)) / Math.pow(Tk, 2);
+                    gamma = dels / (dels + 0.68);
+
+                    E0 = 1.28 * h0 * gamma;
+                    eo_arr.push(E0);
+                }
+
+                plot_div = document.getElementById(month);
+                Plotly.plot(plot_div, [{
+                    x: x_axis,
+                    y: eo_arr
+                }]);
+                console.log(month, temp, radi);
+            }
+
+            console.log(raw_temp);
+/*
             var temp = raw["temp"].map(function(item){
                 return parseFloat(item["TS"]);
             });
@@ -59,6 +129,7 @@
                 x: [...Array(eo_arr.length).keys()],
                 y: eo_arr
             }]);
+*/
         </script>
     </body>
 </html>
