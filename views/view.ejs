@@ -90,12 +90,46 @@
                     eo_arr.push(E0);
                 }
 
-                plot_div = document.getElementById(month);
-                Plotly.plot(plot_div, [{
-                    x: x_axis,
-                    y: eo_arr
-                }]);
+
+                /* LINEAR REGRESSION */
+                x_average = x_axis.reduce(function(a, b){
+                    return a + b;
+                }) / x_axis.length;
+
+                eo_average = eo_arr.reduce(function(a, b){
+                    return a + b;
+                }) / eo_arr.length;
+
+                b_numerator = 0;
+                b_denominator = 0;
+                for(i = 0; i < x_axis.length - 3; i++){
+                    b_numerator += (x_axis[i] - x_average) * (eo_arr[i] - eo_average);
+                    b_denominator += (x_axis[i] - x_average);
+                }
+
+                // Consider equation alpha = y_avg - beta * x_avg
+                beta = b_numerator / b_denominator;
+                alpha = eo_average - beta * x_average;
+                x_p = [...Array(3).keys()].map(function(num){
+                    return num + 2015;
+                })
+
+                eo_p = x_p.map(function(year){
+                    return alpha + beta * year;
+                });
                 console.log(month, temp, radi);
+
+                plot_div = document.getElementById(month);
+                Plotly.plot(plot_div, [
+                    {
+                        x: x_axis,
+                        y: eo_arr
+                    },
+                    {
+                        x: x_p,
+                        y: eo_p
+                    }
+                ]);
             }
 
             console.log(raw_temp);
