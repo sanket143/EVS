@@ -1,5 +1,7 @@
-.dropdown .dropbtn, .navbar a {
-    color: black;
+body {
+  background: url("/images/background.jpg");
+  background-size: cover;
+  background-attachment: fixed;
 }
 
 .navbar a:hover, .dropdown:hover .dropbtn {

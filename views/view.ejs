@@ -7,24 +7,7 @@
         <link rel='stylesheet' href='/stylesheets/view.css' />
     </head>
     <body>
-        <div class="navbar">
-            <a class="navlink" href="/">Home <i class="fas fa-angle-down"></i></a>
-            <a class="navlink">About Us <i class="fas fa-angle-down"></i></a>
-            <a class="navlink" href="/plot">Plot <i class="fas fa-angle-down"></i></a>
-            <!--
-            <div class="dropdown">
-                <button class="dropbtn">
-                    Dropdown 
-                    <i class="fa fa-caret-down"></i>
-                </button>
-                <div class="dropdown-content">
-                    <a href="#">February</a>
-                    <a href="#">Yearly</a>
-                    <a href="#">Predictions</a>
-                </div>
-            </div> 
-            -->
-        </div>
+        <% include navbar.ejs %>
         <div id="plots"> </div>
         <!-- Latest compiled and minified plotly.js JavaScript -->
         <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
@@ -78,7 +61,7 @@
 
                 for(i in temp){
                     Tk = 273 + temp[i];
-                    RA = radi[i];
+                    RA = radi[i] * 1000 / (11.622 * 7);
                     AB = 0.17;
 
                     h0 = RA * (1 - AB) / 58.3;
@@ -115,7 +98,8 @@
                 })
 
                 eo_p = x_p.map(function(year){
-                    return alpha + beta * year;
+                    return eo_average;
+                    // return alpha + beta * year;
                 });
                 console.log(month, temp, radi);
 
@@ -123,13 +107,22 @@
                 Plotly.plot(plot_div, [
                     {
                         x: x_axis,
-                        y: eo_arr
+                        y: eo_arr,
+                        mode: 'markers',
+                        type: 'scatter',
+                        
                     },
                     {
                         x: x_p,
                         y: eo_p
-                    }
-                ]);
+                    },
+                ],
+                // {
+                //     yaxis: {
+                //         range: [0, 1]
+                //     }
+                // }
+                );
             }
 
             console.log(raw_temp);

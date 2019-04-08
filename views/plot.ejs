@@ -2,12 +2,18 @@
 <html>
     <head>
         <title> Plot </title>
+        <link rel="stylesheet" href="/stylesheets/plot.css">
+        <link rel="stylesheet" href="/stylesheets/style.css">
     </head>
     <body>
-        <form action="/view" method="POST" enctype="multipart/form-data">
+        <% include navbar.ejs %>
+        <div class="body">
+            <h3></h3>
+            <form action="/view" method="POST" enctype="multipart/form-data">
 
-            <label>Upload File: </label><input type="file" name="data"><br>
-            <input type="submit">
-        </form>
+                <input type="file" name="data"><br><br>
+                <input type="submit" value="Plot Graph">
+            </form>
+        </div>
     </body>
 </html>

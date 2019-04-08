@@ -16,6 +16,7 @@ router.get("/plot", function(req, res, next){
 router.post("/view", function(req, res, next){
     var form = new multiparty.Form();
     form.parse(req, function(err, fields, files) {
+        console.log(files);
         filePath = files.data[0]["path"];
 
         var obj = {};
@@ -30,4 +31,9 @@ router.post("/view", function(req, res, next){
         });
     });
 })
+
+router.get("/about", function(req, res){
+    res.render("about");
+})
+
 module.exports = router;
