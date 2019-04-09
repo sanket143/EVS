@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title> Plot </title>
+
+        <link rel='stylesheet' href='/stylesheets/style.css' />
+        <link rel='stylesheet' href='/stylesheets/view.css' />
+    </head>
+    <body>
+        <% include navbar.ejs %>
+        <center><h2 style="color: white">Soil Evaporation 2019</h2></center>
+        <div id="plot"> </div>
+        
+        <!-- Latest compiled and minified plotly.js JavaScript -->
+        <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+        <script>
+            var raw = <%- JSON.stringify(data) %>;
+            var Radi = raw["radi"];
+            var Temp = raw["temp"];
+
+            // Convert temperature to Kelvin
+
+            for(i = 0; i < Temp.length; i++){
+                for(j = 0; j < Temp[i].length; j++){
+                    Temp[i][j] = Temp[i][j] + 273;
+                }
+            }
+
+            for(i = 0; i < Radi.length; i++){
+                for(j = 0; j < Radi[i].length; j++){
+                    Radi[i][j] = (1000 * Radi[i][j]) / (11.622 * 30);
+                }
+            }
+
+            function create(a, b){
+                var arr = [];
+                for(i = 0; i < a; i++){
+                    var temp = [];
+                    for(j = 0; j < b; j++){
+                        temp[j] = 0;
+                    }
+
+                    arr.push(temp);
+                }
+
+                return arr;
+            }
+
+            var delta = create(4, 31);
+            var H_0 = create(4, 31);
+            var E_0 = create(4, 31);
+            var albedo = 0.22;
+            
+            for(i = 0; i < Temp.length; i++){
+                for(j = 0; j < Temp[i].length; j++){
+                    delta[i][j] = 5304 * (Math.E ** (21.255 - (53.04 / Temp[i][j]))) / (Temp[i][j] * Temp[i][j]);
+                }
+            }
+
+            for(i = 0; i < Radi.length; i++){
+                for(j = 0; j < Radi[i].length; j++){
+                    H_0[i][j] = Radi[i][j] * ((1 - albedo) / 58.3);
+                }
+            }
+
+            for(i = 0; i < H_0.length; i++){
+                for(j = 0; j < H_0[i].length; j++){
+                    // Considering, gamma = 1
+                    E_0[i][j] = 1.28 * (H_0[i][j]);
+                }
+            }
+
+            /// Areas
+            total_area = 228639;
+            hor_women = 6129;
+            hor_men = 13552;
+            green = 184245;
+            ground = 13927;
+            cep = 3504;
+            lab = 3381;
+            lt = 1572;
+            lp = 2329;
+
+            buildings = total_area - green;
+
+            // ndvi values for building, ground and geenery
+            ndvi = [
+                [0.116223, 0.1956, 0.18298],
+                [0.157, 0.32371667, 0.2757],
+                [0.14115, 0.2453, 0.3739],
+                [0.28441, 0.50875, 0.56638]
+            ];
+
+            var ndvi_weighted = [];
+            for(i = 0; i < 4 ; i++){
+                sum = 0;
+                sum += ndvi[i][0] * buildings;
+                sum += ndvi[i][1] * ground;
+                sum += ndvi[i][2] * green;
+
+                ndvi_weighted[i] = sum / total_area;
+            }
+
+            // VERIFIED
+            var lai = ndvi_weighted.map(function(item){
+                return -(1/0.647) * Math.log(1.08 * (1 - 1.017 * item));
+            })
+
+            var E_S0 = create(4, 31);
+            
+            console.log(E_0);
+            for(i = 0; i < 4; i++){
+                for(j = 0; j < 31; j++){
+                    E_S0[i][j] = E_0[i][j] * (Math.exp(-0.4 * lai[i]));
+                }
+            }
+
+            console.log(E_S0);
+            var sum = 0;
+            var k = 0;
+            var E_final = create(4, 31);
+
+            for(i = 0; i < 4; i++){
+                for(j = 0; j < 31; j++){
+                    if(k == 0 && sum > 6){
+                        k = 1;
+                        t = ((i) * 31 + j);
+                    }
+
+                    if(sum < 6){
+                        E_final[i][j] = E_S0[i][j];
+                        sum += E_S0[i][j];
+                    } else {
+                        E_final[i][j] = (8 / Math.sqrt(Math.PI)) * (sum / ((i) * 31 + (j + 1)));
+                    }
+                }
+            }
+
+            console.log(E_final);
+
+            var final = [];
+            for(i = 0; i < E_final.length; i++){
+                for(j = 0; j < E_final[i].length; j++){
+                    if(E_final[i][j]){
+                        final.push(E_final[i][j]);
+                    }
+                }
+            }
+
+            var x_axis = [...Array(final.length).keys()];
+            var plot_div = document.getElementById("plot");
+            Plotly.plot(plot_div, [
+                {
+                    x: x_axis,
+                    y: final,
+                    mode: 'markers',
+                    type: 'scatter',
+                    
+                }
+            ]);
+        </script>
+    </body>
+</html>

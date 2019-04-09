@@ -73,7 +73,6 @@
                     eo_arr.push(E0);
                 }
 
-
                 /* LINEAR REGRESSION */
                 x_average = x_axis.reduce(function(a, b){
                     return a + b;
@@ -111,52 +110,16 @@
                         mode: 'markers',
                         type: 'scatter',
                         
-                    },
-                    {
-                        x: x_p,
-                        y: eo_p
-                    },
+                    }
                 ],
-                // {
-                //     yaxis: {
-                //         range: [0, 1]
-                //     }
-                // }
-                );
+                {
+                    yaxis: {
+                        range: [0, 6]
+                    }
+                });
             }
 
             console.log(raw_temp);
-/*
-            var temp = raw["temp"].map(function(item){
-                return parseFloat(item["TS"]);
-            });
-
-            var radi = raw["radi"].map(function(item){
-                return parseFloat(item["ALLSKY_SFC_LW_DWN"]);
-            })
-
-            var eo_arr = [];
-
-            for(i in temp){
-                Tk = 273 + temp[i];
-                RA = radi[i];
-                AB = 0.17;
-
-                h0 = RA * (1 - AB) / 58.3;
-
-                dels = 5304 * (Math.pow(Math.E, 21.255 - 5304/Tk)) / Math.pow(Tk, 2);
-                gamma = dels / (dels + 0.68);
-
-                E0 = 1.28 * h0 * gamma;
-                eo_arr.push(E0);
-            }
-
-            plot_div = document.getElementById("plot_div");
-            Plotly.plot(plot_div, [{
-                x: [...Array(eo_arr.length).keys()],
-                y: eo_arr
-            }]);
-*/
         </script>
     </body>
 </html>
